@@ -87,6 +87,7 @@
     </el-dialog>
   </div>
 </template>
+
 <script>
 export default {
   name: "User",
@@ -141,7 +142,7 @@ export default {
       this.form = {}
     },
     handleEdit(row) {
-      this.form = row
+      this.form = JSON.parse(JSON.stringify(row));  //延后处理
       this.dialogFormVisible = true
     },
     del(id) {
