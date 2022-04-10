@@ -31,7 +31,7 @@ export default {
   name: "Header",
   props: {
     collapseBtnClass: String,
-    collapse: '',
+    //collapse: '',
   },
   computed: {
     currentPathName () {
@@ -40,7 +40,7 @@ export default {
   },
   data() {
     return {
-      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
+      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {} //字符串解析成对象
     }
   },
 
@@ -49,6 +49,9 @@ export default {
       this.$router.push("/login")
       localStorage.removeItem("user")
       this.$message.success("退出成功")
+    },
+    collapse(){
+      this.$emit("asideCollapse")
     }
   }
 }

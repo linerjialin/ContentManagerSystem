@@ -30,12 +30,12 @@ export default {
   data(){
     return {
       form:{},
-      user:localStorage.getItem("user") ? JSON.stringify(localStorage.getItem("user")): {} //把字符串解析成对象
+      user:localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")): {} //把字符串解析成对象
     }
   },
   created() {
-    this.request.get("/user/username/").then(res=>{
-    if (res.code == '200'){
+    this.request.get("/user/username/" + this.user.username) .then(res=>{
+    if (res.code === '200'){
       this.form = res.data
     }
     })

@@ -127,6 +127,7 @@ export default {
           address: this.address,
         }
       }).then(res => {
+        console.log(res)
         // 注意data
         this.tableData = res.data.records
         this.total = res.data.total
