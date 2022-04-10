@@ -21,9 +21,15 @@
       >
         <el-button type="danger" slot="reference">批量删除 <i class="el-icon-remove-outline"></i></el-button>
       </el-popconfirm>
-      <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
-      <el-button type="primary">导出 <i class="el-icon-top"></i></el-button>
+      <el-upload action="http://localhost:8181/user/import" :show-file-list="false" accept="xlsx" :on-success="handleExcelImportSuccess" style="display: inline-block">
+        <el-button type="primary" class="ml-5" >导入<i class="el-icon-bottom"></i></el-button>
+      </el-upload>
+
+      <el-button type="primary"class="ml-5" @click="exp">导出<i class="el-icon-top"></i></el-button>
     </div>
+
+
+
 
     <el-table :data="tableData" border stripe :header-cell-class-name="'headerBg'"  @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
@@ -96,7 +102,7 @@ export default {
       tableData: [],
       total: 0,
       pageNum: 1,
-      pageSize: 2,
+      pageSize: 10,
       username: "",
       email: "",
       address: "",
@@ -109,6 +115,7 @@ export default {
     this.load()
   },
   methods: {
+    //刷新页面返回列表
     load() {
       this.request.get("/user/page", {
         params: {
@@ -126,6 +133,7 @@ export default {
 
       })
     },
+    //保存
     save() {
       this.request.post("/user", this.form).then(res => {
         if (res) {
@@ -137,14 +145,26 @@ export default {
         }
       })
     },
+    //添加
     handleAdd() {
       this.dialogFormVisible = true
       this.form = {}
     },
+    //编辑
     handleEdit(row) {
       this.form = JSON.parse(JSON.stringify(row));  //延后处理
       this.dialogFormVisible = true
     },
+    //导入
+    handleExcelImportSuccess(){
+      this.$message.success("导入成功")
+      this.load()
+    },
+    //导出
+    exp(){
+      window.open("http://localhost:8181/user/export")
+    },
+    //删除
     del(id) {
       this.request.delete("/user/" + id).then(res => {
         if (res) {
@@ -155,10 +175,7 @@ export default {
         }
       })
     },
-    handleSelectionChange(val) {
-      console.log(val)
-      this.multipleSelection = val
-    },
+    //批量删除
     delBatch() {
       let ids = this.multipleSelection.map(v => v.id)  // [{}, {}, {}] => [1,2,3]
       this.request.post("/user/del/batch", ids).then(res => {
@@ -170,11 +187,16 @@ export default {
         }
       })
     },
+    //重置
     reset() {
       this.username = ""
       this.email = ""
       this.address = ""
       this.load()
+    },
+    handleSelectionChange(val) {
+      console.log(val)
+      this.multipleSelection = val
     },
     handleSizeChange(pageSize) {
       console.log(pageSize)
