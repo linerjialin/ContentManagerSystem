@@ -9,9 +9,12 @@ const request = axios.create({
 // 可以自请求发送前对请求做一些处理
 // 比如统一加token，对请求参数统一加密
 request.interceptors.request.use(config => {
-    config.headers['Content-Type'] = 'application/json;charset=utf-8';
+   config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    // let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
+    // if (user) {
+    //     config.headers['token'] = user.token;  // 设置请求头
+    // }
 
-    // config.headers['token'] = user.token;  // 设置请求头
     return config
 }, error => {
     return Promise.reject(error)
@@ -30,6 +33,13 @@ request.interceptors.response.use(
         if (typeof res === 'string') {
             res = res ? JSON.parse(res) : res
         }
+        // 当权限验证不通过的时候给出提示
+        //  if (res.code === '401') {
+        //      ElementUI.Message({
+        //          message: res.msg,
+        //          type: 'error'
+        //      });
+        //  }
         return res;
     },
     error => {
