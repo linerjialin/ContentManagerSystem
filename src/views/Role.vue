@@ -32,10 +32,11 @@
       <el-table-column type="selection"></el-table-column>
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
+      <el-table-column prop="flag" label="唯一标识"></el-table-column>
       <el-table-column prop="description" label="描述"></el-table-column>
 
 
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" width="300px">
         <template slot-scope="scope">
           <el-button type="info" @click="selectMenu(scope.row.id)">分配菜单 <i class="el-icon-menu"></i></el-button>
           <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
@@ -70,6 +71,9 @@
         <el-form-item label="名称">
           <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="唯一标识">
+          <el-input v-model="form.flag" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="描述">
           <el-input v-model="form.description" autocomplete="off"></el-input>
         </el-form-item>
@@ -87,13 +91,16 @@
           :data="menuData"
           show-checkbox
           node-key="id"
-          :default-expanded-keys="[1]"
-          :default-checked-keys="[4]"
-          @check-change="handleCheckChange">
+          ref = "tree"
+          :default-expanded-keys="expends"
+          :default-checked-keys="checks">
+        <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span><i :class="data.icon"/>{{data.name}}</span>
+        </span>
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
+        <el-button type="primary" @click="saveRoleMenu">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -119,7 +126,10 @@ export default {
       menuData: [],
       props:{
         label:'name'
-      }
+      },
+      expends:[],
+      checks:[],
+      roleId:0
     }
   },
   created() {
@@ -153,6 +163,20 @@ export default {
         }
       })
     },
+    saveRoleMenu(){
+      this.request.post("/role/roleMenu/"+this.roleId, this.$refs.tree.getCheckedKeys()).then(res => {
+        //console.log(this.$refs.tree.getCheckedNodes())
+        console.log(res)
+        if (res.code === '200'){
+          this.$message.success("绑定成功")
+          this.menuDialogVisible = false
+        } else {
+          this.$message.error(res.msg)
+
+        }
+      })
+    },
+
     //添加
     handleAdd() {
       this.dialogFormVisible = true
@@ -166,13 +190,22 @@ export default {
     //分配菜单
     selectMenu(roleId) {
       this.menuDialogVisible = true
+      this.roleId = roleId
       //请求菜单数据
       this.request.get("/menu").then(res => {
         console.log(res)
         // 注意data
         this.menuData = res.data
 
+        //把后台返回的菜单处理成id数组
+        this.expends = this.menuData.map(v=>v.id)
       })
+      this.request.get("/role/roleMenu/"+roleId).then(res => {
+        console.log(res)
+        // 注意data
+        this.checks = res.data
+      })
+
     },
     //删除
     del(id) {
@@ -201,9 +234,6 @@ export default {
     reset() {
       this.name = ""
       this.load()
-    },
-    handleCheckChange(data, checked, indeterminate) {
-      console.log(data, checked, indeterminate);
     },
     handleSelectionChange(val) {
       console.log(val)

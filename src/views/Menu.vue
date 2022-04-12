@@ -1,4 +1,4 @@
-<template>
+<template xmlns:i="http://www.w3.org/1999/html">
   <div>
     <div style="margin: 10px 0">
       <el-input style="width: 200px" placeholder="请输入名称" suffix-icon="el-icon-search" v-model="name"></el-input>
@@ -19,11 +19,6 @@
       >
         <el-button type="danger" slot="reference">批量删除 <i class="el-icon-remove-outline"></i></el-button>
       </el-popconfirm>
-<!--      <el-upload action="http://localhost:8181/menu/import" :show-file-list="false" accept="xlsx" :on-success="handleExcelImportSuccess" style="display: inline-block">-->
-<!--        <el-button type="primary" class="ml-5" >导入<i class="el-icon-bottom"></i></el-button>-->
-<!--      </el-upload>-->
-
-<!--      <el-button type="primary"class="ml-5" @click="exp">导出<i class="el-icon-top"></i></el-button>-->
     </div>
 
 
@@ -35,7 +30,11 @@
       <el-table-column prop="id" label="ID" ></el-table-column>
       <el-table-column prop="name" label="名称" ></el-table-column>
       <el-table-column prop="path" label="路径" ></el-table-column>
-      <el-table-column prop="icon" label="图标" ></el-table-column>
+      <el-table-column prop="icon" label="图标" class-name="fontSize18" align="center" label-class-name="fontSize12">
+        <template slot-scope="scope">
+          <i :class="scope.row.icon"/>
+        </template>
+      </el-table-column>
       <el-table-column prop="description" label="描述" ></el-table-column>
 
 
@@ -67,7 +66,11 @@
           <el-input v-model="form.path" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="图标">
-          <el-input v-model="form.icon" autocomplete="off"></el-input>
+          <el-select clearable v-model="form.icon" placeholder="请选择" style="width: 100%">
+            <el-option v-for="item in options" :key="item.name" :label="item.name" :value="item.value">
+              <i :class="item.value"/>{{item.name}}
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="描述">
           <el-input v-model="form.description" autocomplete="off"></el-input>
@@ -94,7 +97,9 @@ export default {
       name: "",
       form: {},
       dialogFormVisible: false,
-      multipleSelection: []
+      multipleSelection: [],
+      options:[]
+
     }
   },
   created() {
@@ -111,7 +116,6 @@ export default {
         console.log(res)
         // 注意data
         this.tableData = res.data
-
       })
     },
     //保存
@@ -140,6 +144,13 @@ export default {
     handleEdit(row) {
       this.form = JSON.parse(JSON.stringify(row));  //延后处理
       this.dialogFormVisible = true
+
+      //请求图标的数据
+      this.request.get("/menu/icons").then(res => {
+        this.options = res.data
+
+      })
+
     },
     //导入
     handleExcelImportSuccess(){
@@ -201,4 +212,12 @@ export default {
 .headerBg {
   background: #eee!important;
 }
+.fontSize18{
+  font-size: 18px;
+}
+
+.fontSize12{
+  font-size: 12px;
+}
+
 </style>
