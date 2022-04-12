@@ -8,7 +8,7 @@
         <el-breadcrumb-item>{{ currentPathName }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    <el-dropdown style="width: 100px; cursor: pointer">
+    <el-dropdown style="width: 120px; cursor: pointer">
       <div style="display: inline-block">
         <img :src="user.avatarUrl" alt=""
              style="width: 30px; border-radius: 50%; position: relative; top: 10px; right: 5px">
@@ -31,7 +31,8 @@ export default {
   name: "Header",
   props: {
     collapseBtnClass: String,
-    //collapse: '',
+    // collapse: '',
+    user:Object
   },
   computed: {
     currentPathName () {
@@ -39,9 +40,7 @@ export default {
     }
   },
   data() {
-    return {
-      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {} //字符串解析成对象
-    }
+    return {}
   },
 
   methods: {
