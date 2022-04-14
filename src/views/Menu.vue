@@ -30,6 +30,7 @@
       <el-table-column prop="id" label="ID" ></el-table-column>
       <el-table-column prop="name" label="名称" ></el-table-column>
       <el-table-column prop="path" label="路径" ></el-table-column>
+      <el-table-column prop="pagePath" label="页面路径" ></el-table-column>
       <el-table-column prop="icon" label="图标" class-name="fontSize18" align="center" label-class-name="fontSize12">
         <template slot-scope="scope">
           <i :class="scope.row.icon"/>
@@ -65,6 +66,9 @@
         <el-form-item label="路径">
           <el-input v-model="form.path" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="页面路径">
+          <el-input v-model="form.pagePath" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="图标">
           <el-select clearable v-model="form.icon" placeholder="请选择" style="width: 100%">
             <el-option v-for="item in options" :key="item.name" :label="item.name" :value="item.value">
@@ -85,6 +89,8 @@
 </template>
 
 <script>
+
+
 export default {
   name: "Menu",
   data() {
@@ -152,15 +158,15 @@ export default {
       })
 
     },
-    //导入
-    handleExcelImportSuccess(){
-      this.$message.success("导入成功")
-      this.load()
-    },
-    //导出
-    exp(){
-      window.open("http://localhost:8181/menu/export")
-    },
+    // //导入
+    // handleExcelImportSuccess(){
+    //   this.$message.success("导入成功")
+    //   this.load()
+    // },
+    // //导出
+    // exp(){
+    //   window.open("http://localhost:8181/menu/export")
+    // },
     //删除
     del(id) {
       this.request.delete("/menu/" + id).then(res => {
