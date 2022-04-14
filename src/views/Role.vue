@@ -38,7 +38,7 @@
 
       <el-table-column label="操作" align="center" width="300px">
         <template slot-scope="scope">
-          <el-button type="info" @click="selectMenu(scope.row)">分配菜单 <i class="el-icon-menu"></i></el-button>
+          <el-button type="info" @click="selectMenu(scope.row.id)">分配菜单 <i class="el-icon-menu"></i></el-button>
           <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
           <el-popconfirm
               class="ml-5"
@@ -129,8 +129,7 @@ export default {
       },
       expends:[],
       checks:[],
-      roleId:0,
-      roleFlag:''
+      roleId:0
     }
   },
   created() {
@@ -171,10 +170,6 @@ export default {
         if (res.code === '200'){
           this.$message.success("绑定成功")
           this.menuDialogVisible = false
-          //操作管理员角色后需要重新登录
-          if (this.roleFlag ==='ROLE_ADMIN'){
-            this.$store.commit("logout")
-          }
         } else {
           this.$message.error(res.msg)
 
@@ -193,10 +188,9 @@ export default {
       this.dialogFormVisible = true
     },
     //分配菜单
-    selectMenu(role) {
+    selectMenu(roleId) {
       this.menuDialogVisible = true
-      this.roleId = role.id
-      this.roleFlag = role.flag
+      this.roleId = roleId
       //请求菜单数据
       this.request.get("/menu").then(res => {
         console.log(res)
@@ -206,22 +200,12 @@ export default {
         //把后台返回的菜单处理成id数组
         this.expends = this.menuData.map(v=>v.id)
       })
-      this.request.get("/role/roleMenu/"+this.roleId).then(res => {
+      this.request.get("/role/roleMenu/"+roleId).then(res => {
         console.log(res)
-        this.menuDialogVisible = true
         // 注意data
         this.checks = res.data
-        this.request.get("/menu/ids").then(res => {
-          const ids = res.data
-          ids.forEach(id => {
-            //和选中的菜单id进行对比
-            if (!this.checks.includes(id)){
-              this.$refs.tree.setChecked(id,false)
-            }
-          })
-        })
-
       })
+
     },
     //删除
     del(id) {
